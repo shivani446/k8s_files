@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    php-app: my-app
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      php-app: my-app
+  
+  template:
+    metadata:
+      labels:
+        php-app: my-app
+    spec:
+      initContainers:
+      - name: php1
+        image: shivani446/podcastwala:latest
+        ports:
+        - containerPort: 8081
+        env:
+            - name: DB_DATABASE
+              value: forge
+            - name: DB_HOST
+              value: mariadbservice
+            - name: DB_PASSWORD
+              value: root
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USERNAME
+              value: forge
+        command: ["/bin/sh", "-c"]
+        args: ["php artisan migrate --force"]
+
+
+
+      containers:
+        - env:
+            - name: DB_DATABASE
+              value: forge
+            - name: DB_HOST
+              value: mariadbservice
+            - name: DB_PASSWORD
+              value: root
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USERNAME
+              value: forge
+          image: shivani446/podcastwala:latest
+          name: php
+          ports:
+            - containerPort: 8181
+          
+      restartPolicy: Always
+

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    php-app: mariadb
+  name: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      php-app: mariadb
+  template:
+    metadata:
+      labels:
+        php-app: mariadb
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: forge
+            - name: MYSQL_PASSWORD
+              value: root
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_USER
+              value: forge
+          image: mariadb
+          name: mariadb
+          ports:
+            - containerPort: 3306
+      
+          volumeMounts:
+            - mountPath: /db
+              name: mariadb
+      restartPolicy: Always
+      volumes:
+        - name: mariadb
+          persistentVolumeClaim:
+            claimName: mariadbvolume1
+
